@@ -4,6 +4,9 @@ import { Login } from './pages/Login';
 import { Dashboard } from './pages/Dashboard';
 import { UserManagement } from './pages/UserManagement';
 import { MainLayout } from './layouts/MainLayout';
+import { CourseManagement } from './pages/CourseManagement';
+import { ModuleManagement } from './pages/ModuleManagement';
+import { CourseEnrollment } from './pages/CourseEnrollment';
 
 const ProtectedRoute = ({ children }: { children: JSX.Element }) => {
   const token = localStorage.getItem('access_token');
@@ -33,6 +36,9 @@ const App: React.FC = () => {
           {/* Perbarui file Dashboard Anda agar tidak me-render Navbar/Sidebar lagi karena sudah di-handle MainLayout */}
           <Route path="dashboard" element={<Dashboard />} /> 
           <Route path="users" element={<UserManagement />} />
+          <Route path="courses" element={<CourseManagement />} />
+          <Route path="courses/:courseId/modules" element={<ModuleManagement />} />
+          <Route path="courses/:courseId/enrollments" element={<CourseEnrollment />} />
         </Route>
         
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

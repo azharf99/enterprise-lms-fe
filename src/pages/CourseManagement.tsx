@@ -1,0 +1,184 @@
+import React, { useState, useEffect } from 'react';
+import { getCourses, createCourse, updateCourse, deleteCourse } from '../api/course';
+import { useNavigate } from 'react-router-dom';
+import type { Course } from '../api/course';
+
+export const CourseManagement: React.FC = () => {
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
+  const [formData, setFormData] = useState<Partial<Course>>({ title: '', description: '' });
+
+  const navigate = useNavigate();
+
+  const fetchCourses = async () => {
+    setIsLoading(true);
+    try {
+      const data = await getCourses();
+      setCourses(data || []);
+    } catch (error: any) {
+      setMessage({ type: 'error', text: 'Gagal memuat daftar kursus.' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCourses();
+  }, []);
+
+  const openModal = (mode: 'create' | 'edit', course?: Course) => {
+    setModalMode(mode);
+    if (mode === 'edit' && course) {
+      setFormData({ id: course.id, title: course.title, description: course.description });
+    } else {
+      setFormData({ title: '', description: '' });
+    }
+    setIsModalOpen(true);
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setMessage(null);
+    try {
+      if (modalMode === 'create') {
+        await createCourse(formData);
+        setMessage({ type: 'success', text: 'Kursus berhasil ditambahkan.' });
+      } else if (modalMode === 'edit' && formData.id) {
+        await updateCourse(formData.id, formData);
+        setMessage({ type: 'success', text: 'Data kursus berhasil diperbarui.' });
+      }
+      setIsModalOpen(false);
+      fetchCourses();
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.response?.data?.error || 'Gagal menyimpan kursus.' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!window.confirm('Apakah Anda yakin ingin menghapus kursus ini beserta seluruh modul di dalamnya?')) return;
+    setIsLoading(true);
+    try {
+      await deleteCourse(id);
+      setMessage({ type: 'success', text: 'Kursus berhasil dihapus.' });
+      fetchCourses();
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.response?.data?.error || 'Gagal menghapus kursus.' });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6 relative">
+      {message && (
+        <div className={`p-4 rounded ${message.type === 'success' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+          {message.text}
+        </div>
+      )}
+
+      {/* Header Actions */}
+      <div className="flex justify-between items-center bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+        <h3 className="text-lg font-semibold">Manajemen Kursus (Mata Pelajaran)</h3>
+        <button 
+          onClick={() => openModal('create')} 
+          className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded shadow-sm"
+        >
+          + Tambah Kursus
+        </button>
+      </div>
+
+      {/* Tabel Kursus */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Judul Kursus</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Deskripsi</th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Aksi</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {courses.length === 0 && !isLoading ? (
+              <tr>
+                <td colSpan={4} className="px-6 py-4 text-center text-gray-500">Belum ada kursus.</td>
+              </tr>
+            ) : (
+              courses.map((course) => (
+                <tr key={course.id}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{course.id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{course.title}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500 truncate max-w-xs">{course.description}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-3">
+                    {/* Tombol ini nantinya akan kita arahkan ke halaman Manajemen Modul */}
+                    <button 
+                      onClick={() => navigate(`/courses/${course.id}/modules`)}
+                      className="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded"
+                    >
+                      Kelola Modul
+                    </button>
+                    <button 
+                      onClick={() => navigate(`/courses/${course.id}/enrollments`)}
+                      className="text-green-600 hover:text-green-900 bg-green-50 px-3 py-1 rounded mr-2"
+                    >
+                      Kelola Siswa
+                    </button>
+                    <button onClick={() => openModal('edit', course)} className="text-indigo-600 hover:text-indigo-900">Edit</button>
+                    <button onClick={() => handleDelete(course.id)} className="text-red-600 hover:text-red-900">Hapus</button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Modal Form */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-lg">
+            <h2 className="text-xl font-bold mb-4">{modalMode === 'create' ? 'Tambah Kursus' : 'Edit Kursus'}</h2>
+            <form onSubmit={handleSave} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Judul Kursus</label>
+                <input 
+                  type="text" 
+                  required 
+                  value={formData.title} 
+                  onChange={(e) => setFormData({...formData, title: e.target.value})} 
+                  className="mt-1 w-full border border-gray-300 rounded px-3 py-2" 
+                  placeholder="Contoh: Matematika Lanjut"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Deskripsi Singkat</label>
+                <textarea 
+                  rows={4}
+                  value={formData.description} 
+                  onChange={(e) => setFormData({...formData, description: e.target.value})} 
+                  className="mt-1 w-full border border-gray-300 rounded px-3 py-2"
+                  placeholder="Jelaskan secara singkat tentang mata pelajaran ini..."
+                />
+              </div>
+              
+              <div className="flex justify-end space-x-3 mt-6">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-gray-800">Batal</button>
+                <button type="submit" disabled={isLoading} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">
+                  {isLoading ? 'Menyimpan...' : 'Simpan'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
