@@ -41,7 +41,7 @@ export const CourseManagement: React.FC = () => {
     setIsModalOpen(true);
   };
 
-  const handleSave = async (e: React.FormEvent) => {
+  const handleSave = async (e: React.SubmitEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setMessage(null);
