@@ -3,8 +3,7 @@ import { axiosInstance } from './axiosInstance';
 export interface Lesson {
   id: number;
   module_id: number;
-  lessonType: 'Text' | 'Video' | 'Audio' | 'Image' | 'PDF';
-  type: 'Text' | 'Video' | 'Audio' | 'Image' | 'PDF';
+  lesson_type: 'Text' | 'Video' | 'Audio' | 'Image' | 'PDF';
   title: string;
   content?: string; // Akan berisi tag HTML
   video_url?: string;

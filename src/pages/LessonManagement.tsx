@@ -19,7 +19,7 @@ export const LessonManagement: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
-  const [formData, setFormData] = useState<Partial<Lesson>>({ title: '', lessonType: undefined, content: '', video_url: '', sequence: 1 });
+  const [formData, setFormData] = useState<Partial<Lesson>>({ title: '', lesson_type: undefined, content: '', video_url: '', sequence: 1 });
 
   const fetchLessons = async () => {
     if (!moduleId) return;
@@ -56,7 +56,7 @@ export const LessonManagement: React.FC = () => {
   const openModal = (mode: 'create' | 'edit', lesson?: Lesson) => {
     setModalMode(mode);
     if (mode === 'edit' && lesson) setFormData(lesson);
-    else setFormData({ title: '', lessonType: undefined, content: '', video_url: '', sequence: lessons.length + 1 });
+    else setFormData({ title: '', lesson_type: undefined, content: '', video_url: '', sequence: lessons.length + 1 });
     setIsModalOpen(true);
   };
 
@@ -80,7 +80,7 @@ export const LessonManagement: React.FC = () => {
           <div key={lesson.id} className="bg-white p-6 rounded-lg shadow-sm border flex justify-between items-center">
             <div>
               <div className="flex items-center gap-3 mb-1">
-                <span className="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded font-bold">{lesson.lessonType}</span>
+                <span className="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded font-bold">{lesson.lesson_type}</span>
                 <span className="bg-gray-200 text-gray-700 text-xs px-2 py-1 rounded font-bold">Urutan: {lesson.sequence}</span>
                 <h4 className="text-xl font-bold text-gray-800">{lesson.title}</h4>
               </div>
@@ -112,9 +112,9 @@ export const LessonManagement: React.FC = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Tipe Materi</label>
-                <select onChange={e => setFormData({...formData, lessonType: e.target.value as 'Text' | 'Video' | 'Audio' | 'Image' | 'PDF'})} className="w-full border rounded px-3 py-2 bg-white">
+                <select onChange={e => setFormData({...formData, lesson_type: e.target.value as 'Text' | 'Video' | 'Audio' | 'Image' | 'PDF'})} className="w-full border rounded px-3 py-2 bg-white">
                   {LESSON_TYPES.map(lt => (
-                    <option key={lt.value} value={lt.value} selected={formData.type === lt.value || undefined}>{lt.label}</option>
+                    <option key={lt.value} value={lt.value} selected={formData.lesson_type === lt.value || undefined}>{lt.label}</option>
                   ))}
                 </select>
               </div>
