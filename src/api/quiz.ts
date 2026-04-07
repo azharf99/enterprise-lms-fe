@@ -7,6 +7,8 @@ export interface Quiz {
   description: string;
   time_limit: number; // Dalam menit
   passing_score: number;
+  is_randomized: boolean;
+  max_attempts: number;
 }
 
 export const getQuizzesByModule = async (moduleId: string | number): Promise<Quiz[]> => {

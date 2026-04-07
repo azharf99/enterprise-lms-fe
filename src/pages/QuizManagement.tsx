@@ -11,7 +11,7 @@ export const QuizManagement: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
-  const [formData, setFormData] = useState<Partial<Quiz>>({ title: '', description: '', time_limit: 60, passing_score: 70 });
+  const [formData, setFormData] = useState<Partial<Quiz>>({ title: '', description: '', time_limit: 60, passing_score: 70, is_randomized: false, max_attempts: 1 });
 
   const fetchQuizzes = async () => {
     if (!moduleId) return;
@@ -57,7 +57,7 @@ export const QuizManagement: React.FC = () => {
   const openModal = (mode: 'create' | 'edit', quiz?: Quiz) => {
     setModalMode(mode);
     if (mode === 'edit' && quiz) setFormData(quiz);
-    else setFormData({ title: '', description: '', time_limit: 60, passing_score: 70 });
+    else setFormData({ title: '', description: '', time_limit: 60, passing_score: 70, is_randomized: false, max_attempts: 1 });
     setIsModalOpen(true);
   };
 
@@ -80,6 +80,8 @@ export const QuizManagement: React.FC = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Judul</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Waktu (Menit)</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">KKM</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Randomized</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Max Attempts</th>
               <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Aksi</th>
             </tr>
           </thead>
@@ -89,6 +91,8 @@ export const QuizManagement: React.FC = () => {
                 <td className="px-6 py-4 font-medium">{quiz.title}</td>
                 <td className="px-6 py-4">{quiz.time_limit}</td>
                 <td className="px-6 py-4">{quiz.passing_score}</td>
+                <td className="px-6 py-4">{quiz.is_randomized ? 'Ya' : 'Tidak'}</td>
+                <td className="px-6 py-4">{quiz.max_attempts}</td>
                 <td className="px-6 py-4 text-center space-x-3">
                   <button onClick={() => navigate(`/quizzes/${quiz.id}/questions`)} className="text-blue-600 bg-blue-50 px-3 py-1 rounded">Kelola Soal</button>
                   <button onClick={() => openModal('edit', quiz)} className="text-indigo-600">Edit</button>
@@ -105,11 +109,29 @@ export const QuizManagement: React.FC = () => {
           <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
             <h2 className="text-xl font-bold mb-4">{modalMode === 'create' ? 'Tambah Kuis' : 'Edit Kuis'}</h2>
             <form onSubmit={handleSave} className="space-y-4">
+              <label className="block text-sm font-medium text-gray-700">Judul Kuis</label>
               <input type="text" required placeholder="Judul Kuis" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="w-full border rounded px-3 py-2" />
+              <label className="block text-sm font-medium text-gray-700">Deskripsi</label>
               <textarea placeholder="Deskripsi" value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} className="w-full border rounded px-3 py-2" />
-              <div className="flex gap-4">
+              <div className="flex gap-4 justify-between">
+                <div>
+                <label className="block text-sm font-medium text-gray-700">Waktu (Menit)</label>
                 <input type="number" required placeholder="Waktu (Menit)" value={formData.time_limit} onChange={e => setFormData({...formData, time_limit: Number(e.target.value)})} className="w-full border rounded px-3 py-2" />
+                </div>
+                <div>
+                <label className="block text-sm font-medium text-gray-700">Passing Score</label>
                 <input type="number" required placeholder="Passing Score" value={formData.passing_score} onChange={e => setFormData({...formData, passing_score: Number(e.target.value)})} className="w-full border rounded px-3 py-2" />
+                </div>
+              </div>
+              <div className="flex gap-4 justify-between">
+                <div>
+                <label className="block text-sm font-medium text-gray-700">Randomized</label>
+                <input type="checkbox" checked={formData.is_randomized} onChange={e => setFormData({...formData, is_randomized: e.target.checked})} className="w-full border rounded px-3 py-2" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Max Attempts</label>
+                  <input type="number" required placeholder="Max Attempts" value={formData.max_attempts? formData.max_attempts : undefined} onChange={e => setFormData({...formData, max_attempts: Number(e.target.value)})} className="w-full border rounded px-3 py-2" />
+                </div>
               </div>
               <div className="flex justify-end space-x-3">
                 <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 bg-gray-200 rounded">Batal</button>

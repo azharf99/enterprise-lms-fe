@@ -4,7 +4,7 @@ export interface Module {
   id: number;
   course_id: number;
   title: string;
-  description: string;
+  sequence: number;
   created_at?: string;
 }
 

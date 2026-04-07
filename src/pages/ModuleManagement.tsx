@@ -15,7 +15,7 @@ export const ModuleManagement: React.FC = () => {
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
-  const [formData, setFormData] = useState<Partial<Module>>({ title: '', description: '' });
+  const [formData, setFormData] = useState<Partial<Module>>({ title: '', sequence: undefined });
 
   const fetchModules = async () => {
     if (!courseId) return;
@@ -37,9 +37,9 @@ export const ModuleManagement: React.FC = () => {
   const openModal = (mode: 'create' | 'edit', mod?: Module) => {
     setModalMode(mode);
     if (mode === 'edit' && mod) {
-      setFormData({ id: mod.id, title: mod.title, description: mod.description });
+      setFormData({ id: mod.id, title: mod.title, sequence: mod.sequence });
     } else {
-      setFormData({ title: '', description: '' });
+      setFormData({ title: '', sequence: undefined });
     }
     setIsModalOpen(true);
   };
@@ -131,7 +131,7 @@ export const ModuleManagement: React.FC = () => {
                 <tr key={mod.id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{mod.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{mod.title}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500 truncate max-w-xs">{mod.description}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500 truncate max-w-xs">{mod.sequence}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-3">
                     {/* Tombol ke Manajemen Kuis/Soal */}
                     <button 
@@ -139,6 +139,12 @@ export const ModuleManagement: React.FC = () => {
                       className="text-purple-600 hover:text-purple-900 bg-purple-50 px-3 py-1 rounded"
                     >
                       Kelola Kuis
+                    </button>
+                    <button 
+                      onClick={() => navigate(`/modules/${mod.id}/lessons`)}
+                      className="text-green-600 hover:text-green-900 bg-green-50 px-3 py-1 rounded"
+                    >
+                      Kelola Materi
                     </button>
                     <button onClick={() => openModal('edit', mod)} className="text-indigo-600 hover:text-indigo-900">Edit</button>
                     <button onClick={() => handleDelete(mod.id)} className="text-red-600 hover:text-red-900">Hapus</button>
@@ -168,13 +174,14 @@ export const ModuleManagement: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Deskripsi Singkat</label>
-                <textarea 
-                  rows={4}
-                  value={formData.description} 
-                  onChange={(e) => setFormData({...formData, description: e.target.value})} 
+                <label className="block text-sm font-medium text-gray-700">Sequence/Urutan</label>
+                <input 
+                  type="number"
+                  required
+                  value={formData.sequence ? formData.sequence : undefined} 
+                  onChange={(e) => setFormData({...formData, sequence: Number(e.target.value)})} 
                   className="mt-1 w-full border border-gray-300 rounded px-3 py-2"
-                  placeholder="Jelaskan isi modul ini..."
+                  placeholder="Contoh: 1"
                 />
               </div>
               

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import { axiosInstance } from '../api/axiosInstance';
 
 export const Login: React.FC = () => {
@@ -7,7 +7,7 @@ export const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const handleLogin = async (e: React.SubmitEvent) => {
     e.preventDefault();
@@ -51,7 +51,8 @@ export const Login: React.FC = () => {
       localStorage.setItem('access_token', accessToken);
       localStorage.setItem('refresh_token', refreshToken);
       
-      navigate('/dashboard');
+      // navigate('/dashboard');
+      window.location.href = '/';
       
     } catch (err: any) {
       setError(err.response?.data?.error || err.message || 'Terjadi kesalahan saat login.');
