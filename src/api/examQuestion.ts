@@ -3,7 +3,7 @@ import { axiosInstance } from './axiosInstance';
 export interface ExamQuestion {
   id: number;
   exam_id: number;
-  type: string; // 'MultipleChoice', 'TrueFalse', 'Essay', dll
+  q_type: string; // 'MultipleChoice', 'TrueFalse', 'Essay', dll
   text: string;
   options?: string[] | null;
   correct_answer: any;
@@ -35,7 +35,7 @@ export const deleteExamQuestion = async (questionId: number): Promise<any> => {
 // Fitur Magic: Generate Soal dengan AI khusus untuk Exam
 export const generateExamQuestionsAI = async (
   examId: string | number, 
-  payload: { topic: string, type: string, count: number }
+  payload: { topic: string, q_type: string, count: number }
 ): Promise<any> => {
   const response = await axiosInstance.post(`/exams/${examId}/questions/generate`, payload);
   return response.data;

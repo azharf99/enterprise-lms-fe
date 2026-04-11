@@ -5,7 +5,7 @@ import type { Question } from '../api/question';
 
 
 // Daftar 7 Tipe Soal sesuai standar LMS Enterprise
-const QUESTION_TYPES = [
+export const QUESTION_TYPES = [
   { value: 'MultipleChoice', label: 'Pilihan Ganda (Multiple Choice)' },
   { value: 'MultipleResponse', label: 'Pilihan Ganda Kompleks (Multiple Response)' },
   { value: 'TrueFalse', label: 'Benar / Salah (True / False)' },
@@ -128,7 +128,7 @@ export const QuestionManagement: React.FC = () => {
           <button onClick={() => openManualModal('create')} className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded shadow-sm">
             + Tambah Manual
           </button>
-          <button onClick={() => setIsAiModalOpen(true)} className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold rounded shadow-sm flex items-center gap-2">
+          <button onClick={() => setIsAiModalOpen(true)} className="px-4 py-2 bg-linear-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold rounded shadow-sm flex items-center gap-2">
             ✨ Generate with AI
           </button>
         </div>
