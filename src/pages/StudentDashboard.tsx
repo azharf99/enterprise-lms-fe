@@ -55,7 +55,7 @@ export const StudentDashboard: React.FC = () => {
                       ke halaman yang sudah ada (atau Anda bisa membuat StudentModuleList nanti).
                       Untuk saat ini, kita arahkan ke UI modul bawaan atau langsung ke modul pertama. */}
                   <button 
-                    onClick={() => navigate(`/courses/${course.id}/learn`)} 
+                    onClick={() => navigate(`/courses/${course.id}/modules-student`)} 
                     className="w-full text-center bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white font-semibold py-2 rounded transition-colors"
                   >
                     Buka Kelas
