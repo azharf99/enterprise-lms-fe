@@ -18,7 +18,7 @@ export const ExamQuestionManagement: React.FC = () => {
   
   // Form States
   const [formData, setFormData] = useState<Partial<ExamQuestion>>({
-    q_type: 'MultipleChoice', text: '', options: ['', '', '', '', ''], correct_answer: '', points: 10, explanation: ''
+    type: 'MultipleChoice', text: '', options: ['', '', '', '', ''], correct_answer: '', points: 10, explanation: ''
   });
   const [aiPrompt, setAiPrompt] = useState({ topic: '', q_type: 'MultipleChoice', count: 5 });
 
@@ -62,7 +62,7 @@ export const ExamQuestionManagement: React.FC = () => {
     
     // Pastikan options null jika tipe bukan pilihan ganda
     const finalData = { ...formData };
-    if (finalData.q_type === 'Essay') finalData.options = null;
+    if (finalData.type === 'Essay') finalData.options = null;
 
     try {
       if (modalMode === 'create') await createExamQuestion(examId, finalData);
@@ -79,8 +79,57 @@ export const ExamQuestionManagement: React.FC = () => {
 
   const openManualModal = (mode: 'create' | 'edit', q?: ExamQuestion) => {
     setModalMode(mode);
-    if (mode === 'edit' && q) setFormData(q);
-    else setFormData({ q_type: 'MultipleChoice', text: '', options: ['', '', '', '', ''], correct_answer: '', points: 10, explanation: '' });
+    
+    if (mode === 'edit' && q) {
+      // 1. NORMALISASI OPTIONS
+      let parsedOptions = q.options;
+      console.log(parsedOptions)
+      
+      // Jika Backend mengirim options sebagai JSON String, kita Parse kembali jadi Array
+      if (typeof parsedOptions === 'string') {
+        try { 
+          parsedOptions = JSON.parse(parsedOptions); 
+        } catch (e) { 
+          parsedOptions = null; 
+        }
+      }
+
+      // Pastikan wujudnya benar-benar Array dan panjangnya sesuai
+      if (!Array.isArray(parsedOptions) || parsedOptions.length === 0) {
+        if (q.type === 'MultipleChoice') parsedOptions = ['', '', '', '', ''];
+        else if (q.type === 'TrueFalse') parsedOptions = ['Benar', 'Salah'];
+        else parsedOptions = null;
+      }
+
+      console.log(parsedOptions)
+
+      // 2. NORMALISASI KUNCI JAWABAN (Menghapus kutip berlebih bawaan GORM)
+      let cleanAnswer = q.correct_answer;
+      if (typeof cleanAnswer === 'string') {
+        // Membersihkan jika terbawa string '"Jawaban"' menjadi 'Jawaban'
+        cleanAnswer = cleanAnswer.replace(/^"|"$/g, ''); 
+      }
+
+      console.log(cleanAnswer)
+
+      setFormData({ 
+        ...q, 
+        options: parsedOptions, 
+        correct_answer: cleanAnswer 
+      });
+      
+    } else {
+      // Mode Create Baru
+      setFormData({ 
+        type: 'MultipleChoice', 
+        text: '', 
+        options: ['', '', '', '', ''], 
+        correct_answer: '', 
+        points: 10, 
+        explanation: '' 
+      });
+    }
+    
     setIsModalOpen(true);
   };
 
@@ -135,7 +184,7 @@ export const ExamQuestionManagement: React.FC = () => {
               <div className="flex gap-3 items-start">
                 <span className="bg-blue-100 text-blue-800 font-black px-3 py-1 rounded">{index + 1}</span>
                 <div>
-                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">{q.q_type} • {q.points} Poin</span>
+                  <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">{q.type} • {q.points} Poin</span>
                   <p className="font-semibold text-gray-800 text-lg mt-1 whitespace-pre-wrap">{q.text}</p>
                 </div>
               </div>
@@ -146,7 +195,7 @@ export const ExamQuestionManagement: React.FC = () => {
             </div>
 
             {/* Render Opsi Pilihan Ganda */}
-            {q.q_type !== 'Essay' && q.options && (
+            {q.type !== 'Essay' && q.options && (
               <div className="ml-12 grid grid-cols-1 md:grid-cols-2 gap-2 mt-4">
                 {q.options.map((opt, i) => (
                   <div key={i} className={`p-3 border rounded text-sm font-medium ${opt === q.correct_answer ? 'bg-green-50 border-green-400 text-green-800' : 'bg-gray-50 text-gray-600'}`}>
@@ -158,7 +207,7 @@ export const ExamQuestionManagement: React.FC = () => {
             )}
 
             {/* Kunci Jawaban Essay */}
-            {q.q_type === 'Essay' && (
+            {q.type === 'Essay' && (
               <div className="ml-12 mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
                 <strong>Kunci/Panduan Penilaian:</strong> {q.correct_answer}
               </div>
@@ -227,16 +276,16 @@ export const ExamQuestionManagement: React.FC = () => {
                 <div className="md:col-span-2">
                   <label className="block text-sm font-bold text-gray-700 mb-2">Tipe Soal</label>
                   <select 
-                    value={formData.q_type} 
+                    value={formData.type} 
                     onChange={e => {
                       const newType = e.target.value;
                       // Reset data menyesuaikan tipe
                       if (newType === 'MultipleChoice') {
-                        setFormData({...formData, q_type: newType, options: ['', '', '', '', ''], correct_answer: ''});
+                        setFormData({...formData, type: newType, options: ['', '', '', '', ''], correct_answer: ''});
                       } else if (newType === 'TrueFalse') {
-                        setFormData({...formData, q_type: newType, options: ['Benar', 'Salah'], correct_answer: 'Benar'});
+                        setFormData({...formData, type: newType, options: ['Benar', 'Salah'], correct_answer: 'Benar'});
                       } else {
-                        setFormData({...formData, q_type: newType, options: null, correct_answer: ''});
+                        setFormData({...formData, type: newType, options: null, correct_answer: ''});
                       }
                     }} 
                     className="w-full border-2 border-gray-200 rounded-lg px-4 py-2 focus:border-blue-500 outline-none"
@@ -274,7 +323,7 @@ export const ExamQuestionManagement: React.FC = () => {
                 <label className="block text-sm font-bold text-gray-700 mb-4">Jawaban & Kunci</label>
                 
                 {/* 1. Form Multiple Choice */}
-                {formData.q_type === 'MultipleChoice' && (
+                {formData.type === 'MultipleChoice' && (
                   <div className="space-y-3">
                     <p className="text-xs text-gray-500 mb-3">Pilih radio button di sebelah kiri untuk menentukan kunci jawaban yang benar.</p>
                     {(formData.options || ['', '', '', '', '']).map((opt, i) => (
@@ -303,7 +352,7 @@ export const ExamQuestionManagement: React.FC = () => {
                 )}
 
                 {/* 2. Form True/False */}
-                {formData.q_type === 'TrueFalse' && (
+                {formData.type === 'TrueFalse' && (
                   <div className="flex gap-6">
                     <label className="flex items-center gap-2 cursor-pointer p-3 bg-white border-2 rounded-lg hover:border-blue-400 transition-colors">
                       <input 
@@ -327,7 +376,7 @@ export const ExamQuestionManagement: React.FC = () => {
                 )}
 
                 {/* 3. Form Essay */}
-                {formData.q_type === 'Essay' && (
+                {formData.type === 'Essay' && (
                   <div>
                     <textarea 
                       rows={3} required 

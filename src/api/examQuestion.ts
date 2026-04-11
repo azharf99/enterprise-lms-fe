@@ -3,7 +3,7 @@ import { axiosInstance } from './axiosInstance';
 export interface ExamQuestion {
   id: number;
   exam_id: number;
-  q_type: string; // 'MultipleChoice', 'TrueFalse', 'Essay', dll
+  type: string; // 'MultipleChoice', 'TrueFalse', 'Essay', dll
   text: string;
   options?: string[] | null;
   correct_answer: any;
