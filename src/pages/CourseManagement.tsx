@@ -131,6 +131,9 @@ export const CourseManagement: React.FC = () => {
                     >
                       Kelola Siswa
                     </button>
+                    <button onClick={() => navigate(`/courses/${course.id}/exams`)} className="flex-1 px-3 py-2 bg-purple-50 text-purple-700 font-semibold rounded hover:bg-purple-100 transition-colors">
+                      Exam Akhir
+                    </button>
                     <button onClick={() => openModal('edit', course)} className="text-indigo-600 hover:text-indigo-900">Edit</button>
                     <button onClick={() => handleDelete(course.id)} className="text-red-600 hover:text-red-900">Hapus</button>
                   </td>

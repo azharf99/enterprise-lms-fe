@@ -1,31 +1,37 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { getUserRole } from './utils/auth';
 
-// Import Pages
-import { Login } from './pages/Login';
-import { Dashboard } from './pages/Dashboard';
-import { UserManagement } from './pages/UserManagement';
-import { CourseManagement } from './pages/CourseManagement';
-import { ModuleManagement } from './pages/ModuleManagement';
-import { CourseEnrollment } from './pages/CourseEnrollment';
-import { QuizManagement } from './pages/QuizManagement';
-import { QuestionManagement } from './pages/QuestionManagement';
-import { QuizAttempt } from './pages/QuizAttempt';
-import { StudentDashboard } from './pages/StudentDashboard';
-import { LessonManagement } from './pages/LessonManagement';
-import { StudentLessonView } from './pages/StudentLessonView';
-import { StudentLayout } from './layouts/StudentLayout';
-import { StudentModuleList } from './pages/StudentModuleList';
 // Import Layouts
+import { StudentLayout } from './layouts/StudentLayout';
 import { MainLayout } from './layouts/MainLayout';
 import { FocusLayout } from './layouts/FocusLayout';
+
+// Import Pages
+const Login = lazy(() => import('./pages/Login').then(m => ({ default: m.Login })));
+const Dashboard = lazy(() => import('./pages/Dashboard').then(m => ({ default: m.Dashboard })));
+const UserManagement = lazy(() => import('./pages/UserManagement').then(m => ({ default: m.UserManagement })));
+const CourseManagement = lazy(() => import('./pages/CourseManagement').then(m => ({ default: m.CourseManagement })));
+const ModuleManagement = lazy(() => import('./pages/ModuleManagement').then(m => ({ default: m.ModuleManagement })));
+const LessonManagement = lazy(() => import('./pages/LessonManagement').then(m => ({ default: m.LessonManagement })));
+const QuizManagement = lazy(() => import('./pages/QuizManagement').then(m => ({ default: m.QuizManagement })));
+const QuestionManagement = lazy(() => import('./pages/QuestionManagement').then(m => ({ default: m.QuestionManagement })));
+const CourseEnrollment = lazy(() => import('./pages/CourseEnrollment').then(m => ({ default: m.CourseEnrollment })));
+
+const StudentDashboard = lazy(() => import('./pages/StudentDashboard').then(m => ({ default: m.StudentDashboard })));
+const StudentModuleList = lazy(() => import('./pages/StudentModuleList').then(m => ({ default: m.StudentModuleList })));
+const StudentLessonView = lazy(() => import('./pages/StudentLessonView').then(m => ({ default: m.StudentLessonView })));
+const QuizAttempt = lazy(() => import('./pages/QuizAttempt').then(m => ({ default: m.QuizAttempt })));
+
+const ExamManagement = lazy(() => import('./pages/ExamManagement').then(m => ({ default: m.ExamManagement })));
+const ExamQuestionManagement = lazy(() => import('./pages/ExamQuestionManagement').then(m => ({ default: m.ExamQuestionManagement })));
 
 
 const App: React.FC = () => {
   const role = getUserRole();
   return (
     <BrowserRouter>
+    <Suspense fallback={<div className="h-screen w-screen flex items-center justify-center bg-gray-50 text-blue-600 font-bold">Memuat Halaman...</div>}>
       <Routes>
         {/* Rute Publik */}
         <Route path="/login" element={<Login />} />
@@ -44,6 +50,8 @@ const App: React.FC = () => {
             <Route path="quizzes/:quizId/questions" element={<QuestionManagement />} />
             <Route path="modules/:moduleId/lessons" element={<LessonManagement />} /> 
             {/* ... rute admin lainnya ... */}
+            <Route path="courses/:courseId/exams" element={<ExamManagement />} />
+            <Route path="exams/:examId/questions" element={<ExamQuestionManagement />} />
           </Route>
         ) : null}
         
@@ -69,6 +77,7 @@ const App: React.FC = () => {
         {/* Proteksi Terakhir: Jika tidak login, ke login. Jika rute salah, ke dashboard masing-masing */}
         <Route path="*" element={!role ? <Navigate to="/login" /> : <Navigate to="/" />} />
       </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 };
