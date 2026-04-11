@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getLessonsByModule, type Lesson } from '../api/lesson';
+import DOMPurify from 'dompurify';
 
 export const StudentLessonView: React.FC = () => {
   const { moduleId } = useParams<{ moduleId: string }>();
@@ -85,10 +86,18 @@ export const StudentLessonView: React.FC = () => {
               </div>
             )}
 
-            {/* Konten Teks/HTML */}
+            {/* Konten Teks/HTML yang sudah DISTERILKAN */}
             <div 
-              className="prose max-w-none text-gray-800"
-              dangerouslySetInnerHTML={{ __html: activeLesson.content || '<p>Tidak ada konten</p>' }} 
+              className="prose max-w-none text-gray-800 mt-6"
+              dangerouslySetInnerHTML={{ 
+                __html: DOMPurify.sanitize(activeLesson.content || '<p>Tidak ada konten</p>', {
+                  // Konfigurasi tambahan DOMPurify (Opsional)
+                  // Secara default iframe YouTube dihapus oleh DOMPurify untuk keamanan.
+                  // Jika Anda ingin mengizinkan iframe video yang di-embed lewat Quill, gunakan ALLOWED_TAGS:
+                  ADD_TAGS: ['iframe'], 
+                  ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling']
+                }) 
+              }} 
             />
             
             {/* Navigasi Cepat (Prev/Next Materi) */}

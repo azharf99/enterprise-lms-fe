@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getLessonsByModule, createLesson, updateLesson, deleteLesson, type Lesson } from '../api/lesson';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import { ClassicEditor, Essentials, Paragraph, Bold, Italic, Heading, FontFamily, FontSize, FontColor, FontBackgroundColor, Strikethrough, Subscript, Superscript, Code, Link, BlockQuote, CodeBlock, TodoList, Indent } from 'ckeditor5';
+
+import 'ckeditor5/ckeditor5.css';
 
 
 const LESSON_TYPES = [
@@ -125,7 +129,33 @@ export const LessonManagement: React.FC = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Konten Teks (Mendukung HTML)</label>
-                <textarea rows={8} value={formData.content} onChange={e => setFormData({...formData, content: e.target.value})} placeholder="<p>Selamat datang di materi ini...</p>" className="w-full border rounded px-3 py-2 font-mono text-sm" />
+                <CKEditor
+                editor={ ClassicEditor }
+                config={ {
+                  licenseKey: 'GPL',
+                  plugins: [ Essentials, Paragraph, Bold, Italic, Heading, FontFamily, FontSize, FontColor, FontBackgroundColor, Strikethrough, Subscript, Superscript, Code, Link, BlockQuote, CodeBlock, TodoList, Indent ],
+				          toolbar: {
+                    items: [
+                      'undo', 'redo',
+                      '|',
+                      'heading',
+                      '|',
+                      'fontfamily', 'fontsize', 'fontColor', 'fontBackgroundColor',
+                      '|',
+                      'bold', 'italic', 'strikethrough', 'subscript', 'superscript', 'code',
+                      '|',
+                      'link', 'uploadImage', 'blockQuote', 'codeBlock',
+                      '|',
+                      'bulletedList', 'numberedList', 'todoList', 'outdent', 'indent'
+                    ],
+                    shouldNotGroupWhenFull: false
+                  }
+                } }
+                data='<p>Hello from the first editor working with the context!</p>'
+                onReady={ ( editor ) => {
+                  console.log( 'Editor 1 is ready to use!', editor );
+                } }
+                />
               </div>
               <div className="flex justify-end space-x-3 mt-6">
                 <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 bg-gray-200 rounded">Batal</button>

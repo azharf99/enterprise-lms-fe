@@ -1,60 +1,70 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getCourses, type Course } from '../api/course';
 
 export const StudentDashboard: React.FC = () => {
   const navigate = useNavigate();
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate('/login');
-  };
+  useEffect(() => {
+    const fetchMyCourses = async () => {
+      try {
+        const data = await getCourses();
+        setCourses(data || []);
+      } catch (error) {
+        console.error("Gagal memuat kursus siswa", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchMyCourses();
+  }, []);
 
   return (
-    <div className="max-w-5xl mx-auto mt-10">
-      <div className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
-        <div className="bg-blue-600 p-6 text-white flex justify-between items-center">
-          <div>
-            <h2 className="text-2xl font-bold">Portal Siswa</h2>
-            <p className="text-blue-100 mt-1">Selamat datang di Enterprise LMS.</p>
-          </div>
-          <button 
-            onClick={handleLogout}
-            className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded font-semibold transition-colors"
-          >
-            Keluar
-          </button>
-        </div>
-        
-        <div className="p-8 text-center">
-          <div className="inline-block p-4 bg-blue-50 rounded-full mb-4">
-            <svg className="w-12 h-12 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-            </svg>
-          </div>
-          <h3 className="text-xl font-bold text-gray-800 mb-2">Pilih Kuis atau Ujian Anda</h3>
-          <p className="text-gray-600 mb-8 max-w-md mx-auto">
-            Gunakan tautan (URL) ujian yang diberikan oleh Tutor Anda untuk mulai mengerjakan soal dalam Mode CBT yang aman.
-          </p>
+    <div className="space-y-8">
+      {/* Banner Selamat Datang */}
+      <div className="bg-linear-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-lg">
+        <h1 className="text-3xl font-bold mb-2">Selamat Datang di Ruang Belajar! 👋</h1>
+        <p className="text-blue-100 max-w-2xl">
+          Pilih kelas yang ingin Anda pelajari hari ini, baca materi, dan kerjakan evaluasinya untuk menyelesaikan kursus.
+        </p>
+      </div>
 
-          {/* Fitur opsional: Siswa bisa memasukkan ID kuis manual jika tidak dikasih link */}
-          <div className="max-w-sm mx-auto flex gap-2">
-            <input 
-              type="text" 
-              id="quizIdInput"
-              placeholder="Masukkan ID Kuis..." 
-              className="w-full border rounded px-4 py-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-            <button 
-              onClick={() => {
-                const id = (document.getElementById('quizIdInput') as HTMLInputElement).value;
-                if(id) navigate(`/quizzes/${id}/attempt`);
-              }}
-              className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded"
-            >
-              Mulai
-            </button>
+      {/* Daftar Kursus */}
+      <div>
+        <h2 className="text-xl font-bold text-gray-800 mb-4">Kursus Saya</h2>
+        {isLoading ? (
+          <div className="text-gray-500">Memuat kelas Anda...</div>
+        ) : courses.length === 0 ? (
+          <div className="bg-white p-8 rounded-xl border text-center text-gray-500">
+            Anda belum terdaftar di kursus apa pun. Silakan hubungi Tutor/Admin.
           </div>
-        </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {courses.map(course => (
+              <div key={course.id} className="bg-white border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
+                <div className="h-32 bg-gray-200 bg-linear-to-br from-gray-100 to-gray-300 flex items-center justify-center">
+                  <span className="text-4xl">📚</span>
+                </div>
+                <div className="p-5 flex-1 flex flex-col">
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">{course.title}</h3>
+                  <p className="text-sm text-gray-600 line-clamp-2 mb-4 flex-1">{course.description}</p>
+                  
+                  {/* Karena kita belum membuat halaman List Modul khusus siswa, kita bisa langsung arahkan
+                      ke halaman yang sudah ada (atau Anda bisa membuat StudentModuleList nanti).
+                      Untuk saat ini, kita arahkan ke UI modul bawaan atau langsung ke modul pertama. */}
+                  <button 
+                    onClick={() => navigate(`/courses/${course.id}/learn`)} 
+                    className="w-full text-center bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white font-semibold py-2 rounded transition-colors"
+                  >
+                    Buka Kelas
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

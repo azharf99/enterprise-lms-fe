@@ -15,88 +15,61 @@ import { QuizAttempt } from './pages/QuizAttempt';
 import { StudentDashboard } from './pages/StudentDashboard';
 import { LessonManagement } from './pages/LessonManagement';
 import { StudentLessonView } from './pages/StudentLessonView';
-
+import { StudentLayout } from './layouts/StudentLayout';
+import { StudentModuleList } from './pages/StudentModuleList';
 // Import Layouts
 import { MainLayout } from './layouts/MainLayout';
 import { FocusLayout } from './layouts/FocusLayout';
 
-// 1. Guard Khusus Admin & Tutor
-const AdminRoute = ({ children }: { children: JSX.Element }) => {
-  const role = getUserRole();
-  if (!role) return <Navigate to="/login" replace />;
-  if (role !== 'Admin' && role !== 'Tutor') {
-    return <Navigate to="/student-dashboard" replace />; // Lempar ke area siswa
-  }
-  return children;
-};
-
-// 2. Guard Khusus Siswa
-const StudentRoute = ({ children }: { children: JSX.Element }) => {
-  const role = getUserRole();
-  if (!role) return <Navigate to="/login" replace />;
-  // Admin juga boleh ngetes tampilan siswa
-  return children; 
-};
-
-// 3. Pengecekan Login Awal (Auto Redirect berdasarkan Role)
-const RootRedirect = () => {
-  const role = getUserRole();
-  if (!role) return <Navigate to="/login" replace />;
-  if (role === 'Siswa') return <Navigate to="/student-dashboard" replace />;
-  return <Navigate to="/dashboard" replace />;
-};
 
 const App: React.FC = () => {
+  const role = getUserRole();
   return (
     <BrowserRouter>
       <Routes>
+        {/* Rute Publik */}
         <Route path="/login" element={<Login />} />
-        
-        {/* Redirect Root berdasarkan Role */}
-        <Route path="/" element={<RootRedirect />} />
 
         {/* =========================================
-            GRUP 1: ADMIN & TUTOR (Main Layout dengan Sidebar)
+            GRUP 1: ADMIN & TUTOR (Main Layout / Sidebar)
             ========================================= */}
-        <Route 
-          path="/" 
-          element={
-            <AdminRoute>
-              <MainLayout />
-            </AdminRoute>
-          }
-        >
-          <Route path="dashboard" element={<Dashboard />} /> 
-          <Route path="users" element={<UserManagement />} />
-          <Route path="courses" element={<CourseManagement />} />
-          <Route path="courses/:courseId/modules" element={<ModuleManagement />} />
-          <Route path="courses/:courseId/enrollments" element={<CourseEnrollment />} />
-          <Route path="modules/:moduleId/quizzes" element={<QuizManagement />} /> 
-          <Route path="quizzes/:quizId/questions" element={<QuestionManagement />} />
-          <Route path="modules/:moduleId/lessons" element={<LessonManagement />} />
-        </Route>
+        {role === 'Admin' || role === 'Tutor' ? (
+          <Route path="/" element={<MainLayout />}>
+            <Route path="dashboard" element={<Dashboard />} /> 
+            <Route path="users" element={<UserManagement />} />
+            <Route path="courses" element={<CourseManagement />} />
+            <Route path="courses/:courseId/modules" element={<ModuleManagement />} />
+            <Route path="courses/:courseId/enrollments" element={<CourseEnrollment />} />
+            <Route path="modules/:moduleId/quizzes" element={<QuizManagement />} /> 
+            <Route path="quizzes/:quizId/questions" element={<QuestionManagement />} />
+            <Route path="modules/:moduleId/lessons" element={<LessonManagement />} /> 
+            {/* ... rute admin lainnya ... */}
+          </Route>
+        ) : null}
         
         {/* =========================================
-            GRUP 2: SISWA (Focus Layout Tanpa Sidebar)
+            GRUP SISWA (Belajar & Dashboard)
             ========================================= */}
-        <Route 
-          path="/" 
-          element={
-            <StudentRoute>
-              <FocusLayout />
-            </StudentRoute>
-          }
-        >
-          <Route path="student-dashboard" element={<StudentDashboard />} />
+        {role === 'Siswa' ? (
+          <Route path="/" element={<StudentLayout />}>
+            <Route index element={<Navigate to="/student-dashboard" replace />} />
+            <Route path="student-dashboard" element={<StudentDashboard />} />
+            <Route path="courses/:courseId/modules-student" element={<StudentModuleList />} />
+          </Route>
+        ) : null}
+
+        {/* =========================================
+            GRUP KHUSUS (CBT & Materi Fokus)
+            ========================================= */}
+        <Route element={<FocusLayout />}>
+          <Route path="modules/:moduleId/learn" element={<StudentLessonView />} />
           <Route path="quizzes/:quizId/attempt" element={<QuizAttempt />} />
         </Route>
 
-        {/* Fallback 404 Route */}
-        <Route path="*" element={<RootRedirect />} />
-        <Route path="modules/:moduleId/learn" element={<StudentLessonView />} />
+        {/* Proteksi Terakhir: Jika tidak login, ke login. Jika rute salah, ke dashboard masing-masing */}
+        <Route path="*" element={!role ? <Navigate to="/login" /> : <Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
   );
 };
-
 export default App;
