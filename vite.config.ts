@@ -13,23 +13,25 @@ export default defineConfig({
     },
   },
   build: {
-    // Naikkan sedikit batas peringatan agar tidak terlalu sensitif
-    chunkSizeWarningLimit: 1000, 
+    // Naikkan batas peringatan ke 2000kB karena penggunaan library berat (CKEditor & Recharts)
+    chunkSizeWarningLimit: 2000, 
     rollupOptions: {
       output: {
-        // Konfigurasi Manual Chunking
+        // Konfigurasi Manual Chunking untuk membagi file JS besar
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            // Pisahkan CKEditor ke file vendor-ckeditor.js
-            if (id.includes('@ckeditor')) {
-              return 'vendor-ckeditor';
-            }
-            // Pisahkan ekosistem React ke file vendor-react.js
+            // Pisahkan library yang sangat berat ke chunk masing-masing
+            if (id.includes('@ckeditor')) return 'vendor-ckeditor';
+            if (id.includes('recharts')) return 'vendor-charts';
+            if (id.includes('lucide-react')) return 'vendor-icons';
+            
+            // Pisahkan ekosistem inti ke chunk sendiri
             if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
-              return 'vendor-react';
+              return 'vendor-core';
             }
-            // Sisa library lainnya ke vendor.js
-            return 'vendor';
+            
+            // Sisa library node_modules lainnya
+            return 'vendor-libs';
           }
         }
       }
