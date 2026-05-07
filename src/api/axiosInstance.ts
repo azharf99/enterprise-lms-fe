@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = '/api';
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const axiosInstance = axios.create({
   baseURL: API_URL,
@@ -47,7 +47,7 @@ axiosInstance.interceptors.response.use(
 
     // Jika error 401 dan BUKAN berasal dari endpoint login atau refresh itu sendiri
     if (error.response?.status === 401 && !originalRequest._retry) {
-      
+
       // ANTI-INFINITE LOOP: Cegah request ulang jika gagal di endpoint refresh
       if (originalRequest.url.includes('/users/refresh')) {
         localStorage.removeItem('access_token');
