@@ -6,11 +6,9 @@ import {
   TrendingUp, 
   CheckCircle,
   Clock,
-  Calendar,
   MoreVertical,
   Trophy,
-  User as UserIcon,
-  ChevronRight
+  User as UserIcon
 } from 'lucide-react';
 import { getUserRole } from '../utils/auth';
 import { Link } from 'react-router-dom';

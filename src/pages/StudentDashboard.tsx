@@ -9,7 +9,8 @@ import {
   Star,
   BookOpen,
   Filter,
-  Search
+  Search,
+  Users
 } from 'lucide-react';
 
 export const StudentDashboard: React.FC = () => {

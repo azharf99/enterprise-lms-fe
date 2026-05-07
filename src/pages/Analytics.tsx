@@ -8,13 +8,7 @@ import {
   YAxis, 
   CartesianGrid, 
   Tooltip, 
-  ResponsiveContainer, 
-  PieChart, 
-  Pie, 
-  Cell,
-  LineChart,
-  Line,
-  Legend
+  ResponsiveContainer
 } from 'recharts';
 import { 
   ArrowLeft, 
@@ -23,10 +17,9 @@ import {
   Award, 
   AlertCircle,
   ChevronRight,
-  Download
+  Download,
+  CheckCircle
 } from 'lucide-react';
-
-const COLORS = ['#2563eb', '#7c3aed', '#db2777', '#ea580c', '#16a34a'];
 
 export const Analytics: React.FC = () => {
   const { examId } = useParams<{ examId: string }>();

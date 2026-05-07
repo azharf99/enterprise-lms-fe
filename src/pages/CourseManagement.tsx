@@ -13,7 +13,8 @@ import {
   FileText,
   Filter,
   ArrowRight,
-  X
+  X,
+  CheckCircle
 } from 'lucide-react';
 
 export const CourseManagement: React.FC = () => {
