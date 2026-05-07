@@ -10,6 +10,7 @@ export interface Exam {
   passing_score: number;
   cbt_token: string;
   is_randomized: boolean;
+  status: string;
   start_time?: string | null;
   end_time?: string | null;
 }

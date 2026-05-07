@@ -21,7 +21,8 @@ export const ExamManagement: React.FC = () => {
     cbt_token: '', 
     is_randomized: true,
     start_time: '',
-    end_time: ''
+    end_time: '',
+    status: 'Draft'
   });
 
   const fetchExams = async () => {
@@ -88,7 +89,7 @@ export const ExamManagement: React.FC = () => {
       setFormData({ ...exam, start_time: st, end_time: et });
     } else {
       setFormData({ 
-        title: '', exam_type: 'PAS', description: '', time_limit: 90, passing_score: 70, cbt_token: '', is_randomized: true, start_time: '', end_time: '' 
+        title: '', exam_type: 'PAS', description: '', time_limit: 90, passing_score: 70, cbt_token: '', is_randomized: true, start_time: '', end_time: '', status: 'Draft' 
       });
     }
     setIsModalOpen(true);
@@ -159,6 +160,7 @@ export const ExamManagement: React.FC = () => {
                   </select>
                 </div>
               </div>
+             
 
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">Deskripsi & Aturan</label>
@@ -195,6 +197,14 @@ export const ExamManagement: React.FC = () => {
                   <label className="block text-sm font-bold text-gray-700 mb-1">Waktu Selesai (Opsional)</label>
                   <input type="datetime-local" value={formData.end_time || ''} onChange={e => setFormData({...formData, end_time: e.target.value})} className="w-full border rounded px-3 py-2" />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Visibilitas</label>
+                <select required value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})} className="w-full border rounded px-3 py-2 focus:ring-purple-500 focus:border-purple-500">
+                  <option value="Draft">Draft</option>
+                  <option value="Published">Published</option>
+                </select>
               </div>
 
               <div className="flex justify-end space-x-3 mt-8 pt-4 border-t">
