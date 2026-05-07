@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   BookOpen, 
   BarChart2, 
@@ -9,16 +9,55 @@ import {
   Star,
   Globe,
   Shield,
-  Zap
+  Zap,
+  Loader2
 } from 'lucide-react';
+import { getUserRole } from '../utils/auth';
+import { getCourses, type Course } from '../api/course';
+import { selfEnroll } from '../api/enrollment';
 
 export const LandingPage: React.FC = () => {
+  const navigate = useNavigate();
+  const role = getUserRole();
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [enrollingId, setEnrollingId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const data = await getCourses();
+        setCourses(data.slice(0, 4)); // Show first 4 courses as "popular"
+      } catch (error) {
+        console.error("Failed to fetch courses");
+      }
+    };
+    fetchCourses();
+  }, []);
+
+  const handleEnroll = async (courseId: number) => {
+    if (!role) {
+      navigate('/register');
+      return;
+    }
+    
+    setEnrollingId(courseId);
+    try {
+      await selfEnroll(courseId);
+      navigate(role === 'Siswa' ? '/student-dashboard' : '/dashboard');
+    } catch (error) {
+      // If already enrolled, just go to dashboard
+      navigate(role === 'Siswa' ? '/student-dashboard' : '/dashboard');
+    } finally {
+      setEnrollingId(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white font-['Plus_Jakarta_Sans',sans-serif] text-[#191b23]">
       {/* Navigation */}
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-20">
             <div className="flex items-center gap-2">
               <div className="bg-[#2563eb] p-1.5 rounded-lg">
                 <BookOpen className="w-6 h-6 text-white" />
@@ -30,13 +69,24 @@ export const LandingPage: React.FC = () => {
               <a href="#courses" className="hover:text-[#2563eb] transition-colors">Courses</a>
               <a href="#features" className="hover:text-[#2563eb] transition-colors">Features</a>
               <a href="#about" className="hover:text-[#2563eb] transition-colors">About</a>
-              <Link to="/login" className="hover:text-[#2563eb] transition-colors">Login</Link>
-              <Link 
-                to="/login" 
-                className="bg-[#2563eb] text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition-all shadow-sm hover:shadow-md"
-              >
-                Join for Free
-              </Link>
+              {role ? (
+                <Link 
+                  to={role === 'Siswa' ? '/student-dashboard' : '/dashboard'} 
+                  className="bg-[#2563eb] text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition-all shadow-sm hover:shadow-md"
+                >
+                  Go to Dashboard
+                </Link>
+              ) : (
+                <>
+                  <Link to="/login" className="hover:text-[#2563eb] transition-colors">Login</Link>
+                  <Link 
+                    to="/register" 
+                    className="bg-[#2563eb] text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition-all shadow-sm hover:shadow-md"
+                  >
+                    Join for Free
+                  </Link>
+                </>
+              )}
             </div>
 
             <div className="md:hidden">
@@ -65,10 +115,10 @@ export const LandingPage: React.FC = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link 
-                  to="/login" 
+                  to={role ? (role === 'Siswa' ? '/student-dashboard' : '/dashboard') : '/register'} 
                   className="inline-flex items-center justify-center gap-2 bg-[#2563eb] text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition-all shadow-lg shadow-blue-200"
                 >
-                  Get Started <ArrowRight className="w-5 h-5" />
+                  {role ? 'Go to Dashboard' : 'Get Started'} <ArrowRight className="w-5 h-5" />
                 </Link>
                 <a 
                   href="#courses" 
@@ -167,61 +217,41 @@ export const LandingPage: React.FC = () => {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              {
-                title: 'Project Management Professional (PMP)',
-                instructor: 'Sarah Jenkins',
-                rating: 4.8,
-                students: '12,450',
-                price: '$89.99',
-                img: 'https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?auto=format&fit=crop&w=400&q=80'
-              },
-              {
-                title: 'Data Analytics for Strategic Leadership',
-                instructor: 'Dr. Michael Chen',
-                rating: 4.9,
-                students: '8,200',
-                price: '$94.99',
-                img: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=400&q=80'
-              },
-              {
-                title: 'Agile & Scrum Mastery: Enterprise Edition',
-                instructor: 'Emma Rodriguez',
-                rating: 4.7,
-                students: '15,100',
-                price: '$79.99',
-                img: 'https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=400&q=80'
-              },
-              {
-                title: 'Cloud Architecture & Security Design',
-                instructor: 'David Wilson',
-                rating: 4.9,
-                students: '6,300',
-                price: '$124.99',
-                img: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=400&q=80'
-              }
-            ].map((course, i) => (
-              <div key={i} className="bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-lg transition-all cursor-pointer group">
-                <div className="aspect-video relative overflow-hidden">
-                  <img src={course.img} alt={course.title} className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500" />
-                  <div className="absolute top-2 right-2 bg-white/90 backdrop-blur px-2 py-1 rounded text-xs font-bold shadow-sm">
-                    Bestseller
-                  </div>
-                </div>
-                <div className="p-5">
-                  <h3 className="font-bold mb-1 line-clamp-2 min-h-[3rem] group-hover:text-[#2563eb] transition-colors">{course.title}</h3>
-                  <p className="text-sm text-gray-500 mb-2">{course.instructor}</p>
-                  <div className="flex items-center gap-1 mb-3">
-                    <span className="font-bold text-[#b4690e]">{course.rating}</span>
-                    <div className="flex text-[#b4690e]">
-                      {[...Array(5)].map((_, i) => <Star key={i} className={`w-3 h-3 ${i < 4 ? 'fill-current' : ''}`} />)}
+            {courses.length > 0 ? (
+              courses.map((course) => (
+                <div key={course.id} className="bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-lg transition-all flex flex-col group">
+                  <div className="aspect-video relative overflow-hidden">
+                    <img src={`https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=400&q=80`} alt={course.title} className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500" />
+                    <div className="absolute top-2 right-2 bg-white/90 backdrop-blur px-2 py-1 rounded text-[10px] font-bold shadow-sm uppercase tracking-wider">
+                      Course
                     </div>
-                    <span className="text-xs text-gray-400">({course.students})</span>
                   </div>
-                  <div className="font-extrabold text-xl">{course.price}</div>
+                  <div className="p-5 flex-1 flex flex-col">
+                    <h3 className="font-bold mb-1 line-clamp-2 min-h-[3rem] group-hover:text-[#2563eb] transition-colors">{course.title}</h3>
+                    <p className="text-xs text-gray-500 mb-2 line-clamp-1">{course.description}</p>
+                    <div className="flex items-center gap-1 mb-4">
+                      <span className="font-bold text-[#b4690e] text-sm">4.8</span>
+                      <div className="flex text-[#b4690e]">
+                        {[...Array(5)].map((_, i) => <Star key={i} className={`w-3 h-3 ${i < 4 ? 'fill-current' : ''}`} />)}
+                      </div>
+                    </div>
+                    <div className="mt-auto pt-4 border-t border-gray-50">
+                      <button 
+                        onClick={() => handleEnroll(course.id)}
+                        disabled={enrollingId === course.id}
+                        className="w-full bg-[#2563eb] text-white py-2.5 rounded-lg text-sm font-bold hover:bg-blue-700 transition-all flex items-center justify-center gap-2"
+                      >
+                        {enrollingId === course.id ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Enroll Now'}
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              [...Array(4)].map((_, i) => (
+                <div key={i} className="bg-gray-100 rounded-xl aspect-square animate-pulse" />
+              ))
+            )}
           </div>
         </div>
       </section>

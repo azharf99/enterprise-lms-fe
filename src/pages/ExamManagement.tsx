@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getExamsByCourse, createExam, updateExam, deleteExam, type Exam } from '../api/exam';
+import { Edit2, Trash2 } from 'lucide-react';
 
 export const ExamManagement: React.FC = () => {
   const { courseId } = useParams<{ courseId: string }>();
@@ -128,11 +129,30 @@ export const ExamManagement: React.FC = () => {
             </div>
             
             <div className="flex gap-2 mt-2 pt-4 border-t">
-              <button onClick={() => navigate(`/exams/${exam.id}/questions`)} className="flex-1 px-3 py-2 bg-blue-50 text-blue-700 font-semibold rounded hover:bg-blue-100 transition-colors">
-                Kelola Soal
+              <button 
+                onClick={() => navigate(`/exams/${exam.id}/questions`)} 
+                className="flex-1 px-3 py-2 bg-blue-50 text-blue-700 font-bold rounded-xl hover:bg-blue-100 transition-all text-sm"
+              >
+                Manage Questions
               </button>
-              <button onClick={() => openModal('edit', exam)} className="px-3 py-2 text-indigo-600 hover:bg-indigo-50 font-semibold rounded">Edit</button>
-              <button onClick={async () => { if(window.confirm('Hapus exam ini?')) { await deleteExam(exam.id); fetchExams(); } }} className="px-3 py-2 text-red-600 hover:bg-red-50 font-semibold rounded">Hapus</button>
+              <button 
+                onClick={() => navigate(`/exams/${exam.id}/analytics`)} 
+                className="flex-1 px-3 py-2 bg-purple-50 text-purple-700 font-bold rounded-xl hover:bg-purple-100 transition-all text-sm"
+              >
+                Analytics
+              </button>
+              <button 
+                onClick={() => openModal('edit', exam)} 
+                className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+              >
+                <Edit2 className="w-5 h-5" />
+              </button>
+              <button 
+                onClick={async () => { if(window.confirm('Hapus exam ini?')) { await deleteExam(exam.id); fetchExams(); } }} 
+                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
+              >
+                <Trash2 className="w-5 h-5" />
+              </button>
             </div>
           </div>
         ))}

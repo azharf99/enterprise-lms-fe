@@ -8,29 +8,36 @@ import {
   Clock,
   Calendar,
   MoreVertical,
-  Trophy
+  Trophy,
+  User as UserIcon,
+  ChevronRight
 } from 'lucide-react';
+import { getUserRole } from '../utils/auth';
+import { Link } from 'react-router-dom';
 
 export const Dashboard: React.FC = () => {
+  const role = getUserRole();
+  const isTutor = role === 'Tutor';
+
   const stats = [
-    { label: 'Total Students', value: '1,284', change: '+12%', icon: <Users className="w-6 h-6 text-blue-600" />, bg: 'bg-blue-50' },
-    { label: 'Active Courses', value: '42', change: '+5%', icon: <BookOpen className="w-6 h-6 text-purple-600" />, bg: 'bg-purple-50' },
-    { label: 'Completion Rate', value: '86%', change: '+2.4%', icon: <TrendingUp className="w-6 h-6 text-green-600" />, bg: 'bg-green-50' },
-    { label: 'Revenue', value: '$12.4k', change: '+18%', icon: <BarChart2 className="w-6 h-6 text-orange-600" />, bg: 'bg-orange-50' },
+    { label: isTutor ? 'My Students' : 'Total Students', value: '1,284', change: '+12%', icon: <Users className="w-6 h-6 text-blue-600" />, bg: 'bg-blue-50' },
+    { label: isTutor ? 'My Courses' : 'Active Courses', value: '42', change: '+5%', icon: <BookOpen className="w-6 h-6 text-purple-600" />, bg: 'bg-purple-50' },
+    { label: 'Avg. Completion', value: '86%', change: '+2.4%', icon: <TrendingUp className="w-6 h-6 text-green-600" />, bg: 'bg-green-50' },
+    { label: 'Revenue Earned', value: '$12.4k', change: '+18%', icon: <BarChart2 className="w-6 h-6 text-orange-600" />, bg: 'bg-orange-50' },
   ];
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight">Admin Dashboard</h1>
-          <p className="text-gray-500 font-medium">Welcome back! Here's what's happening today.</p>
+          <h1 className="text-3xl font-extrabold tracking-tight">{isTutor ? 'Instructor Dashboard' : 'Admin Dashboard'}</h1>
+          <p className="text-gray-500 font-medium">Welcome back! Here's what's happening with your programs.</p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="bg-white border border-gray-100 px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm hover:bg-gray-50 transition-all flex items-center gap-2">
-            <Calendar className="w-4 h-4" />
-            Oct 2026
-          </button>
+          <Link to="/profile" className="bg-white border border-gray-100 px-4 py-2.5 rounded-xl text-sm font-bold shadow-sm hover:bg-gray-50 transition-all flex items-center gap-2">
+            <UserIcon className="w-4 h-4" />
+            My Profile
+          </Link>
           <button className="bg-[#2563eb] text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all">
             Download Report
           </button>

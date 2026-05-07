@@ -10,6 +10,8 @@ import { FocusLayout } from './layouts/FocusLayout';
 // Import Pages
 const LandingPage = lazy(() => import('./pages/LandingPage').then(m => ({ default: m.LandingPage })));
 const Login = lazy(() => import('./pages/Login').then(m => ({ default: m.Login })));
+const Register = lazy(() => import('./pages/Register').then(m => ({ default: m.Register })));
+const Profile = lazy(() => import('./pages/Profile').then(m => ({ default: m.Profile })));
 const Dashboard = lazy(() => import('./pages/Dashboard').then(m => ({ default: m.Dashboard })));
 const UserManagement = lazy(() => import('./pages/UserManagement').then(m => ({ default: m.UserManagement })));
 const CourseManagement = lazy(() => import('./pages/CourseManagement').then(m => ({ default: m.CourseManagement })));
@@ -27,6 +29,7 @@ const QuizAttempt = lazy(() => import('./pages/QuizAttempt').then(m => ({ defaul
 const ExamManagement = lazy(() => import('./pages/ExamManagement').then(m => ({ default: m.ExamManagement })));
 const ExamQuestionManagement = lazy(() => import('./pages/ExamQuestionManagement').then(m => ({ default: m.ExamQuestionManagement })));
 const ExamAttemptPage = lazy(() => import('./pages/ExamAttempt').then(m => ({ default: m.ExamAttemptPage })));
+const Analytics = lazy(() => import('./pages/Analytics').then(m => ({ default: m.Analytics })));
 
 const App: React.FC = () => {
   const role = getUserRole();
@@ -37,6 +40,7 @@ const App: React.FC = () => {
         {/* Rute Publik */}
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
         {/* =========================================
             GRUP 1: ADMIN & TUTOR (Main Layout / Sidebar)
@@ -44,6 +48,7 @@ const App: React.FC = () => {
         {role === 'Admin' || role === 'Tutor' ? (
           <Route element={<MainLayout />}>
             <Route path="/dashboard" element={<Dashboard />} /> 
+            <Route path="/profile" element={<Profile />} />
             <Route path="/users" element={<UserManagement />} />
             <Route path="/courses" element={<CourseManagement />} />
             <Route path="/courses/:courseId/modules" element={<ModuleManagement />} />
@@ -53,6 +58,7 @@ const App: React.FC = () => {
             <Route path="/modules/:moduleId/lessons" element={<LessonManagement />} /> 
             <Route path="/courses/:courseId/exams" element={<ExamManagement />} />
             <Route path="/exams/:examId/questions" element={<ExamQuestionManagement />} />
+            <Route path="/exams/:examId/analytics" element={<Analytics />} />
           </Route>
         ) : null}
         
@@ -62,6 +68,7 @@ const App: React.FC = () => {
         {role === 'Siswa' ? (
           <Route element={<StudentLayout />}>
             <Route path="/student-dashboard" element={<StudentDashboard />} />
+            <Route path="/student-profile" element={<Profile />} />
             <Route path="/courses/:courseId/modules-student" element={<StudentModuleList />} />
           </Route>
         ) : null}
@@ -82,5 +89,6 @@ const App: React.FC = () => {
     </BrowserRouter>
   );
 };
+
 
 export default App;

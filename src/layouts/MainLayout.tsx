@@ -10,6 +10,7 @@ import {
   ChevronRight,
   User
 } from 'lucide-react';
+import { getUserRole } from '../utils/auth';
 
 export const MainLayout: React.FC = () => {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ export const MainLayout: React.FC = () => {
     { name: 'Dashboard', path: '/dashboard', icon: <LayoutDashboard className="w-5 h-5" /> },
     { name: 'Users', path: '/users', icon: <Users className="w-5 h-5" /> },
     { name: 'Courses', path: '/courses', icon: <BookOpen className="w-5 h-5" /> },
+    { name: 'Profile', path: '/profile', icon: <User className="w-5 h-5" /> },
   ];
 
   return (
@@ -94,8 +96,8 @@ export const MainLayout: React.FC = () => {
             <div className="h-8 w-[1px] bg-gray-100 mx-1"></div>
             <div className="flex items-center gap-3">
               <div className="text-right hidden sm:block">
-                <div className="text-sm font-bold text-[#191b23]">Administrator</div>
-                <div className="text-[11px] text-gray-400 font-medium">Enterprise Admin</div>
+                <div className="text-sm font-bold text-[#191b23]">{getUserRole() === 'Admin' ? 'Administrator' : 'Instructor'}</div>
+                <div className="text-[11px] text-gray-400 font-medium">Enterprise {getUserRole()}</div>
               </div>
               <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center text-[#2563eb]">
                 <User className="w-6 h-6" />

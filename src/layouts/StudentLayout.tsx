@@ -89,10 +89,10 @@ export const StudentLayout: React.FC = () => {
                     <LayoutDashboard className="w-4 h-4 text-gray-400" />
                     My Learning
                   </Link>
-                  <a href="#" className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors">
+                  <Link to="/student-profile" className="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors">
                     <Settings className="w-4 h-4 text-gray-400" />
                     Account Settings
-                  </a>
+                  </Link>
                   <div className="border-t border-gray-50 mt-2 pt-2">
                     <button 
                       onClick={handleLogout}

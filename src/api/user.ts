@@ -23,7 +23,24 @@ export const importUsersCSV = async (file: File): Promise<any> => {
   return response.data;
 };
 
-// --- TAMBAHAN CRUD ---
+// --- AUTH & PROFILE ---
+
+export const registerUser = async (data: Partial<User>): Promise<any> => {
+  const response = await axiosInstance.post('/users/register', data);
+  return response.data;
+};
+
+export const getProfile = async (): Promise<User> => {
+  const response = await axiosInstance.get('/users/profile');
+  return response.data.data;
+};
+
+export const updateProfile = async (data: Partial<User>): Promise<any> => {
+  const response = await axiosInstance.put('/users/profile', data);
+  return response.data;
+};
+
+// --- TAMBAHAN CRUD (ADMIN) ---
 
 export const createUser = async (data: Partial<User>): Promise<any> => {
   const response = await axiosInstance.post('/users', data);
